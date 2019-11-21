@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TerrainType{
+public enum TerrainType
+{
     StandNone,
     StandOne,
     StandTwo,
@@ -28,13 +29,32 @@ public class TerrainObj : MonoBehaviour
 
 
 
-    public int GetPoolType() {
+    public int GetPoolType()
+    {
         return _curPoolType;
     }
 
     //重置数据
     public void ResetObj()
     {
+        gameObject.SetActive(false);
+        transform.position = Vector3.zero;
+    }
+    public void ResetObjWait()
+    {
+        if (gameObject.activeSelf)
+        {
+
+
+            StartCoroutine(HideObj());
+        }
+
+
+    }
+
+    IEnumerator HideObj()
+    {
+        yield return new WaitForSeconds(2.0f);
         gameObject.SetActive(false);
         transform.position = Vector3.zero;
     }
@@ -45,24 +65,28 @@ public class TerrainObj : MonoBehaviour
     }
 
     //获取位置
-    public Vector3 GetWalkPointPos(int idx) {
+    public Vector3 GetWalkPointPos(int idx)
+    {
         if (idx >= walkPoints.Length) return Vector3.zero;
 
         Vector3 pos = walkPoints[idx].transform.position;
         return pos;
     }
 
-    public Vector3[] GetWalkPointPosArr() {
+    public Vector3[] GetWalkPointPosArr()
+    {
         Vector3[] posArr = new Vector3[walkPoints.Length];
 
-        for (int i = 0; i < walkPoints.Length; i++) {
+        for (int i = 0; i < walkPoints.Length; i++)
+        {
             posArr[i] = walkPoints[i].transform.position;
         }
 
         return posArr;
     }
 
-    public int GetWalkPointCnt() {
+    public int GetWalkPointCnt()
+    {
         return walkPoints.Length;
     }
 

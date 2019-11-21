@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 4969180452131787621}
   - component: {fileID: 9221860782955568174}
   - component: {fileID: 4374158706902754467}
+  - component: {fileID: 9112632491510929071}
   m_Layer: 0
-  m_Name: Terrain_Type7
-  m_TagString: Untagged
+  m_Name: Terrain_Type8
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2746ad59b3c0da144babc1f29eb68339, type: 3}
+  - {fileID: 2100000, guid: ad9f7f48d9d8c0a4b956c0b342d850cb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -67,6 +68,7 @@ MeshRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -94,7 +96,19 @@ MonoBehaviour:
   standType: 1
   walkPoints:
   - {fileID: 4103755818816320046}
-  enemy: {fileID: 2151414450917411708, guid: 9db2e8fea61599f449644282b69a0ccf, type: 3}
+--- !u!65 &9112632491510929071
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2175340802874689905}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.3793696, y: 3.1315904, z: 1.2575622}
+  m_Center: {x: 0.049707472, y: -1.5657952, z: -0.044222146}
 --- !u!1 &4103755818816320046
 GameObject:
   m_ObjectHideFlags: 0

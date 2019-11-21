@@ -11,20 +11,23 @@ public class TerrainMgr : MonoBehaviour
     private int _curTerrainType;//当前渲染的地形
 
     private Vector3 _smoothVecolity;
-    private float _terrainMoveDisZ = 0;//地形z总偏移量
+    public float _terrainMoveDisZ = 0;//地形z总偏移量
 
 
     public Transform terrainsShowNode;//要展示的地形父节点
     public Transform terrainsPoolNode;//对象池存放的父节点
     public GameObject[] terrainsPreb;//所有地形预制
     public int maxTerrainsCnt = 8;//渲染最大地形数，包括空地形
+    public int oneStepTerrainCnt = 50;
+
+    public Transform[] waterPlanes;//65
 
     //初始化地形相关
     public void InitTerrains()
     {
         InitTerrainsPool();
         InitTerrainsData();
-        InitTerrainsView();
+        InitTerrainsView(new Vector3(0,0,0));
     }
 
     public List<int> GetTerrainDataList() {
@@ -35,12 +38,6 @@ public class TerrainMgr : MonoBehaviour
 
         return type == 0;
     }
-
-
-
-
-
-
 
 
 
@@ -126,14 +123,14 @@ public class TerrainMgr : MonoBehaviour
     }
 
     //初始化地形
-    private void InitTerrainsView()
+    private void InitTerrainsView(Vector3 startPos)
     {
         for (int i = 0; i < _terrainsDataList.Count; i++)
         {
             int type = _terrainsDataList[i];
             GameObject terrain = GetTerrianByType(type);
 
-            Vector3 pos = terrain.transform.position;
+            Vector3 pos = terrain.transform.position+startPos;
 
 
             terrain.transform.position = new Vector3(pos.x, pos.y, _terrainMoveDisZ);
@@ -175,8 +172,19 @@ public class TerrainMgr : MonoBehaviour
         }
 
         _terrainMoveDisZ += targetOffset;
+        UpdateWaterPlanes();
     }
 
+
+    private void UpdateWaterPlanes(){
+        int cnt = (int)(_terrainMoveDisZ/85);
+        if(cnt%2==0){
+            waterPlanes[1].transform.position = new Vector3(waterPlanes[1].transform.position.x,waterPlanes[1].transform.position.y,(cnt+1)*80);
+        }else{
+            waterPlanes[0].transform.position = new Vector3(waterPlanes[0].transform.position.x,waterPlanes[0].transform.position.y,(cnt+1)*80);
+        }
+
+    }
 
 
     //更新地形数据信息
@@ -210,9 +218,8 @@ public class TerrainMgr : MonoBehaviour
         type = obj.GetComponent<TerrainObj>().GetPoolType();
         List<GameObject> terrainList = _terriansPool[type];
         terrainList.Add(obj.gameObject);
-        obj.GetComponent<TerrainObj>().ResetObj();
+        obj.GetComponent<TerrainObj>().ResetObjWait();
         obj.SetParent(terrainsPoolNode);
-
 
         PrintTerrainInfo();
     }
@@ -248,25 +255,9 @@ public class TerrainMgr : MonoBehaviour
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private void PrintTerrainInfo()
     {
-        //return;
+        return;
         string info = "";
         for (int i = 0; i < _terrainsDataList.Count; i++)
         {

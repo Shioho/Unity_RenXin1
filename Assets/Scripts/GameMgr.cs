@@ -14,6 +14,7 @@ public class GameMgr : MonoBehaviour    //主控制管理器
 {
     private TerrainMgr _terrainMgr;
     private EnemyMgr _enemyMgr;
+    private CameraEffectMgr _cameraEffectMgr;
 
 
     private Transform _myPlayer;
@@ -29,15 +30,24 @@ public class GameMgr : MonoBehaviour    //主控制管理器
     private List<Vector3> _enemiesPosList = new List<Vector3>();
 
     public GameObject playerPrefab;
+    public CanvasMgr canvasMgr;
 
     private void Awake()
     {
+        _cameraMain = Camera.main;
         _terrainMgr = GetComponent<TerrainMgr>();
         _enemyMgr = GetComponent<EnemyMgr>();
+        _cameraEffectMgr = _cameraMain.GetComponent<CameraEffectMgr>();
+
+        //0.创建角色摄像机跟随
+        _myPlayer = Instantiate(playerPrefab).transform;
+        _myPlayerScript = _myPlayer.GetComponent<PlayerObj>();
+        _playerCameraPos = _myPlayer.Find("cameraPos");
+        FSMOnEnter.onEnterEvents+=DoHarmPlayer;
 
         //1.初始化地形
-
         _terrainMgr.InitTerrains();
+
         //2.存储当前地形的点信息
         InitPointList();
 
@@ -45,12 +55,12 @@ public class GameMgr : MonoBehaviour    //主控制管理器
         _enemyMgr.InitEnemies(_enemiesPosList);
 
 
-        //4.创建角色摄像机跟随
-        _myPlayer = Instantiate(playerPrefab).transform;
-        _myPlayerScript = _myPlayer.GetComponent<PlayerObj>();
-        _cameraMain = Camera.main;
-        _playerCameraPos = _myPlayer.Find("cameraPos");
+    }
 
+    private void DoHarmPlayer(GameObject obj,string type){
+        if(type!="OnEnemyAttackEnter")return;
+        _myPlayerScript.DoBeatenAnima();
+        DoMissEvent();
     }
 
     private void InitPointList()
@@ -106,6 +116,7 @@ public class GameMgr : MonoBehaviour    //主控制管理器
     private void UpdatePlayerPos(int tIdx, int pIdx)
     {
         _myPlayerScript.UpdatePosState(tIdx, pIdx);
+        _myPlayerScript.StopJumpAnima();
     }
 
 
@@ -138,7 +149,7 @@ public class GameMgr : MonoBehaviour    //主控制管理器
         UpdateCameraPos();
     }
 
-    private void DoPlayerKill()
+    public void DoPlayerKill()
     {
         PointType type = GetNextPointType();
         switch (type)
@@ -146,24 +157,48 @@ public class GameMgr : MonoBehaviour    //主控制管理器
             case PointType.Enemy:
                 {
                     //杀敌
-                    DoPlayerMove();
+                    _myPlayerScript.DoAttackAnima();
                     _enemyMgr.DoKillEnemy();
+                    int combo = _enemyMgr.GetEnemyKillCombo();
+                    canvasMgr.UpdateCombo(combo);
+                    DoPlayerMove();
+
                     break;
                 }
             case PointType.None:
             case PointType.Empty:
                 {
-                    //TODO操作失误
-                    Debug.LogWarning("操作失误拉！！！");
+                    //操作失误
+                    DoMissEvent();
                     break;
                 }
-
         }
+        UpdateEffectComboInfo();
+    }
 
+    private void DoMissEvent()
+    {
+        _enemyMgr.ResetKillCombo();
+        int combo = _enemyMgr.GetEnemyKillCombo();
+        canvasMgr.UpdateCombo(combo);
+        UpdateEffectComboInfo();
+        Debug.LogWarning("操作失误拉！！！");
     }
 
 
-    private void DoPlayerJump()
+    private void UpdateEffectComboInfo()
+    {
+        PointType type = GetNextPointType();
+        if(type==PointType.Enemy){
+            _enemyMgr.DoNextEnemyPrepareAttack();
+        }
+
+        int combo = _enemyMgr.GetEnemyKillCombo();
+        _cameraEffectMgr.UpdateEffectState(combo);
+    }
+
+
+    public void DoPlayerJump()
     {
 
         PointType type = GetNextPointType();
@@ -174,16 +209,18 @@ public class GameMgr : MonoBehaviour    //主控制管理器
             case PointType.None:
                 {
                     DoPlayerMove();
+                    _myPlayerScript.DoJumpAnima();
                     break;
                 }
             case PointType.Enemy:
                 {
-                    //TODO操作失误
-                    Debug.LogWarning("操作失误拉！！！");
+                    //操作失误
+                    DoMissEvent();
                     break;
                 }
 
         }
+        UpdateEffectComboInfo();
     }
 
 
@@ -217,30 +254,33 @@ public class GameMgr : MonoBehaviour    //主控制管理器
 
 
 
-    private void UpdatePointTypeDic() {
+    private void UpdatePointTypeDic()
+    {
         List<int> terrainList = _terrainMgr.GetTerrainDataList();
         int idx = terrainList.Count - 1;
         _enemiesPosList = new List<Vector3>();
 
         //前移
-        for (int i = 0; i < idx; i++) {
+        for (int i = 0; i < idx; i++)
+        {
             _pointTypeDic[i] = _pointTypeDic[i + 1];
         }
 
 
         //更新最后一个
-        int preType = terrainList[idx-1];
+        int preType = terrainList[idx - 1];
         int type = terrainList[idx];
         _pointTypeDic[idx] = new List<PointType>();
 
-        TerrainObj  script = _terrainMgr.GetTerrainObjByIdx(idx).GetComponent<TerrainObj>();
+        TerrainObj script = _terrainMgr.GetTerrainObjByIdx(idx).GetComponent<TerrainObj>();
         int cnt = script.GetWalkPointCnt();
         if (cnt == 0)
         {
             _pointTypeDic[idx].Add(PointType.None);
             return;
         }
-        for (int i = 0; i < cnt; i++) {
+        for (int i = 0; i < cnt; i++)
+        {
             if (_terrainMgr.CheckIsEmptyTerrainByType(preType))
             {
                 preType = 1;
@@ -254,7 +294,7 @@ public class GameMgr : MonoBehaviour    //主控制管理器
             }
         }
 
-        
+
     }
 
 
@@ -264,7 +304,6 @@ public class GameMgr : MonoBehaviour    //主控制管理器
 
     private void DoPlayerMove()
     {
-
         TerrainObj terrainObj = _terrainMgr.GetCurPlayerTerrain().GetComponent<TerrainObj>();
 
         int pIdx = _myPlayerScript.GetCurPointIdx();
@@ -288,7 +327,8 @@ public class GameMgr : MonoBehaviour    //主控制管理器
 
         }
 
-        while (GetCurPointType()==PointType.None) {
+        while (GetCurPointType() == PointType.None)
+        {
             DoPlayerMove();
         }
     }
@@ -297,7 +337,15 @@ public class GameMgr : MonoBehaviour    //主控制管理器
 
     private void UpdatePlayerMove()
     {
+        _playerTargetPos.y = _myPlayer.position.y;
         _myPlayer.position = Vector3.SmoothDamp(_myPlayer.position, _playerTargetPos, ref _playerSmoothVecolity, 0.1f);
+
+        Vector3 dir = _playerTargetPos - _myPlayer.position;
+        if (dir != Vector3.zero)
+        {
+            _myPlayerScript.ChangeModelForward(dir);
+        }
+
     }
 
 

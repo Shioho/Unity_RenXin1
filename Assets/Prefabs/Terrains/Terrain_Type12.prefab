@@ -70,9 +70,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5809207011392643051}
   - component: {fileID: 5809207011392643050}
+  - component: {fileID: 154673342749268306}
   m_Layer: 0
   m_Name: Terrain_Type12
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -112,7 +113,19 @@ MonoBehaviour:
   - {fileID: 3014647230316209841}
   - {fileID: 6728210999346772051}
   - {fileID: 2006836806618377712}
-  enemy: {fileID: 2151414450917411708, guid: 9db2e8fea61599f449644282b69a0ccf, type: 3}
+--- !u!65 &154673342749268306
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5809207011392643053}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 5.860737, y: 3.3012695, z: 4.257641}
+  m_Center: {x: 0.27853298, y: -1.5391598, z: 0.16437721}
 --- !u!1 &6728210999346772051
 GameObject:
   m_ObjectHideFlags: 0
@@ -153,6 +166,10 @@ PrefabInstance:
     - target: {fileID: 100000, guid: d10f9ef6c4c93644ea1df37eaf6e8812, type: 3}
       propertyPath: m_Name
       value: "\u5730\u5F62\u5757B2"
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: d10f9ef6c4c93644ea1df37eaf6e8812, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: d10f9ef6c4c93644ea1df37eaf6e8812, type: 3}
       propertyPath: m_LocalPosition.x
@@ -198,6 +215,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: d10f9ef6c4c93644ea1df37eaf6e8812, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: ad9f7f48d9d8c0a4b956c0b342d850cb, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d10f9ef6c4c93644ea1df37eaf6e8812, type: 3}
 --- !u!4 &5809207011977265788 stripped
